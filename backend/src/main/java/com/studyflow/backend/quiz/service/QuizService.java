@@ -14,6 +14,8 @@ import com.studyflow.backend.quiz.entity.QuizQuestion;
 import com.studyflow.backend.quiz.repository.QuizOptionRepository;
 import com.studyflow.backend.quiz.repository.QuizQuestionRepository;
 import com.studyflow.backend.quiz.repository.QuizRepository;
+import com.studyflow.backend.quiz.dto.UpdateQuizRequest;
+import com.studyflow.backend.quiz.dto.UpdateQuestionRequest;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -21,7 +23,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
-
+import com.studyflow.backend.quiz.repository.QuizAttemptRepository;
 import java.util.List;
 
 @Service
@@ -33,19 +35,22 @@ public class QuizService {
     private final QuizOptionRepository optionRepository;
     private final CourseRepository courseRepository;
     private final LectureRepository lectureRepository;
+    private final QuizAttemptRepository attemptRepository;
 
     public QuizService(
             QuizRepository quizRepository,
             QuizQuestionRepository questionRepository,
             QuizOptionRepository optionRepository,
             CourseRepository courseRepository,
-            LectureRepository lectureRepository
+            LectureRepository lectureRepository,
+            QuizAttemptRepository attemptRepository
     ) {
         this.quizRepository = quizRepository;
         this.questionRepository = questionRepository;
         this.optionRepository = optionRepository;
         this.courseRepository = courseRepository;
         this.lectureRepository = lectureRepository;
+        this.attemptRepository = attemptRepository;
     }
 
     // =========================================================
@@ -307,6 +312,243 @@ public class QuizService {
                 .toList();
     }
 
+
+    // =========================================================
+    // ADMIN: GET QUIZ DETAILS
+    // =========================================================
+
+    public QuizResponse getQuizByIdForAdmin(Long quizId) {
+
+        Quiz quiz = quizRepository.findById(quizId)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Quiz not found"
+                ));
+
+        return toQuizResponse(quiz);
+    }
+
+
+    // =========================================================
+    // ADMIN: GET ALL QUESTIONS INCLUDING UNPUBLISHED QUIZ
+    // =========================================================
+
+    public List<QuizQuestionResponse> getQuizQuestionsForAdmin(
+            Long quizId
+    ) {
+
+        if (!quizRepository.existsById(quizId)) {
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND,
+                    "Quiz not found"
+            );
+        }
+
+        return questionRepository
+                .findByQuizIdOrderBySequenceNumberAsc(quizId)
+                .stream()
+                .map(question -> {
+                    List<QuizOption> options =
+                            optionRepository.findByQuestionIdOrderByIdAsc(
+                                    question.getId()
+                            );
+
+                    return toQuestionResponse(question, options);
+                })
+                .toList();
+    }
+
+
+    // =========================================================
+    // ADMIN: UNPUBLISH QUIZ
+    // =========================================================
+
+    @Transactional
+    public QuizResponse unpublishQuiz(Long quizId) {
+
+        Quiz quiz = quizRepository.findById(quizId)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Quiz not found"
+                ));
+
+        if (!quiz.isPublished()) {
+            return toQuizResponse(quiz);
+        }
+
+        // Protect existing assessment history.
+        if (attemptRepository.existsByQuizId(quizId)) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "Cannot unpublish this quiz because student "
+                            + "attempts already exist."
+            );
+        }
+
+        quiz.setPublished(false);
+
+        return toQuizResponse(quizRepository.save(quiz));
+    }
+
+    // =========================================================
+// ADMIN: UPDATE QUIZ DETAILS
+// =========================================================
+
+    @Transactional
+    public QuizResponse updateQuiz(
+            Long quizId,
+            UpdateQuizRequest request
+    ) {
+        Quiz quiz = quizRepository.findById(quizId)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Quiz not found"
+                ));
+
+        validateQuizEditable(quiz);
+
+        quiz.setTitle(request.title().trim());
+        quiz.setDescription(normalizeOptionalText(request.description()));
+        quiz.setDurationMinutes(request.durationMinutes());
+        quiz.setPassingPercentage(request.passingPercentage());
+
+        return toQuizResponse(quizRepository.save(quiz));
+    }
+
+    // =========================================================
+// ADMIN: UPDATE QUESTION AND OPTIONS
+// =========================================================
+
+    @Transactional
+    public QuizQuestionResponse updateQuestion(
+            Long quizId,
+            Long questionId,
+            UpdateQuestionRequest request
+    ) {
+        Quiz quiz = quizRepository.findById(quizId)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Quiz not found"
+                ));
+
+        validateQuizEditable(quiz);
+
+        QuizQuestion question = questionRepository
+                .findByIdAndQuizId(questionId, quizId)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Question not found in this quiz"
+                ));
+
+        long correctOptions = request.options()
+                .stream()
+                .filter(option -> Boolean.TRUE.equals(option.correct()))
+                .count();
+
+        if (correctOptions != 1) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Each question must have exactly one correct option"
+            );
+        }
+
+        boolean sequenceExists =
+                questionRepository
+                        .existsByQuizIdAndSequenceNumberAndIdNot(
+                                quizId,
+                                request.sequenceNumber(),
+                                questionId
+                        );
+
+        if (sequenceExists) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "Another question already uses this sequence number"
+            );
+        }
+
+        question.setQuestionText(request.questionText().trim());
+        question.setSequenceNumber(request.sequenceNumber());
+        question.setMarks(request.marks());
+
+        QuizQuestion savedQuestion =
+                questionRepository.save(question);
+
+        // Existing options can be replaced because this quiz
+        // has no student attempts.
+        List<QuizOption> existingOptions =
+                optionRepository.findByQuestionId(questionId);
+
+        optionRepository.deleteAll(existingOptions);
+        optionRepository.flush();
+
+        List<QuizOption> updatedOptions = request.options()
+                .stream()
+                .map(optionRequest -> {
+                    QuizOption option = new QuizOption();
+                    option.setQuestion(savedQuestion);
+                    option.setOptionText(
+                            optionRequest.optionText().trim()
+                    );
+                    option.setCorrect(optionRequest.correct());
+                    return option;
+                })
+                .toList();
+
+        List<QuizOption> savedOptions =
+                optionRepository.saveAll(updatedOptions);
+
+        return toQuestionResponse(savedQuestion, savedOptions);
+    }
+
+    @Transactional
+    public void deleteQuiz(Long quizId) {
+        Quiz quiz = quizRepository.findById(quizId)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Quiz not found with id: " + quizId
+                ));
+
+        if (attemptRepository.existsByQuizId(quizId)) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "Cannot delete a quiz after student attempts exist"
+            );
+        }
+
+        quizRepository.delete(quiz);
+    }
+
+    @Transactional
+    public void deleteQuestion(Long quizId, Long questionId) {
+        Quiz quiz = quizRepository.findById(quizId)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Quiz not found with id: " + quizId
+                ));
+
+        if (attemptRepository.existsByQuizId(quizId)) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "Cannot delete questions after student attempts exist"
+            );
+        }
+
+        QuizQuestion question = questionRepository
+                .findByIdAndQuizId(questionId, quizId)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Question not found with id: " + questionId
+                ));
+
+        optionRepository.deleteAll(
+                optionRepository.findByQuestionId(questionId)
+        );
+
+        questionRepository.delete(question);
+    }
+
+
     // =========================================================
     // DTO MAPPERS
     // =========================================================
@@ -350,5 +592,30 @@ public class QuizService {
                 question.getMarks(),
                 optionResponses
         );
+    }
+
+    private void validateQuizEditable(Quiz quiz) {
+
+        if (quiz.isPublished()) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "Unpublish the quiz before editing it"
+            );
+        }
+
+        if (attemptRepository.existsByQuizId(quiz.getId())) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "Cannot modify a quiz after student attempts exist"
+            );
+        }
+    }
+
+    private String normalizeOptionalText(String value) {
+        if (value == null || value.isBlank()) {
+            return null;
+        }
+
+        return value.trim();
     }
 }

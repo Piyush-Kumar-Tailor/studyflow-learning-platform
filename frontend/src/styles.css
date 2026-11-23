@@ -1,3 +1,148 @@
-/* You can add global styles to this file, and also import other style files */
 
 @import 'tailwindcss';
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* STUDYFLOW AURORA - LIGHT */
+:root {
+  color-scheme: light;
+
+  --sf-background: #F6F7FB;
+  --sf-surface: #FFFFFF;
+  --sf-surface-secondary: #F0F1F8;
+
+  --sf-foreground: #17203A;
+  --sf-muted: #68738B;
+  --sf-border: #E8ECF4;
+
+  --sf-primary: #5546D9;
+  --sf-primary-hover: #4636C4;
+  --sf-primary-foreground: #FFFFFF;
+
+  --sf-accent: #0D9B82;
+  --sf-success: #15966F;
+  --sf-warning: #D99524;
+  --sf-danger: #D94F62;
+
+  --sf-brand-tint: #E9E7FF;
+  --sf-shadow:
+    0 8px 28px rgba(38, 43, 85, 0.055);
+}
+
+/* STUDYFLOW AURORA - DARK */
+.dark {
+  color-scheme: dark;
+
+  --sf-background: #11182A;
+  --sf-surface: #1D2940;
+  --sf-surface-secondary: #26344D;
+
+  --sf-foreground: #F1F4FC;
+  --sf-muted: #AAB6CB;
+  --sf-border: #334158;
+
+  --sf-primary: #8175F4;
+  --sf-primary-hover: #958BFF;
+  --sf-primary-foreground: #FFFFFF;
+
+  --sf-accent: #38C9A9;
+  --sf-success: #38C99B;
+  --sf-warning: #F5C46A;
+  --sf-danger: #FB8291;
+
+  --sf-brand-tint: #302B55;
+  --sf-shadow: 0 8px 28px rgba(0, 0, 0, 0.20);
+}
+
+/* TAILWIND TOKENS */
+@theme inline {
+  --color-background: var(--sf-background);
+  --color-surface: var(--sf-surface);
+  --color-surface-secondary: var(--sf-surface-secondary);
+
+  --color-foreground: var(--sf-foreground);
+  --color-muted: var(--sf-muted);
+  --color-border: var(--sf-border);
+
+  --color-primary: var(--sf-primary);
+  --color-primary-hover: var(--sf-primary-hover);
+  --color-primary-foreground: var(--sf-primary-foreground);
+
+  --color-accent: var(--sf-accent);
+  --color-success: var(--sf-success);
+  --color-warning: var(--sf-warning);
+  --color-danger: var(--sf-danger);
+
+  --font-sans: Inter, sans-serif;
+}
+
+/* GLOBAL */
+* {
+  box-sizing: border-box;
+}
+
+html {
+  min-height: 100%;
+  scroll-behavior: smooth;
+}
+
+body {
+  min-height: 100vh;
+  margin: 0;
+  background: var(--sf-background);
+  color: var(--sf-foreground);
+  font-family: Inter, system-ui, sans-serif;
+  transition: background-color 220ms ease, color 220ms ease;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+::selection {
+  background: var(--sf-primary);
+  color: white;
+}
+
+:focus-visible {
+  outline: 2px solid var(--sf-accent);
+  outline-offset: 3px;
+}
+
+/* REUSABLE DESIGN COMPONENTS */
+.sf-card {
+  background: var(--sf-surface);
+  border: 1px solid var(--sf-border);
+  border-radius: 18px;
+  box-shadow: var(--sf-shadow);
+}
+
+.sf-brand-tint {
+  background: var(--sf-brand-tint);
+}
+
+.sf-primary-button {
+  background: var(--sf-primary);
+  color: var(--sf-primary-foreground);
+  border-radius: 12px;
+  padding: 11px 18px;
+  font-weight: 600;
+  transition: 180ms ease;
+}
+
+.sf-primary-button:hover {
+  background: var(--sf-primary-hover);
+  transform: translateY(-1px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}

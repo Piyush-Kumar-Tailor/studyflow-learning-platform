@@ -15,7 +15,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
-
+import com.studyflow.backend.enrollment.repository.LectureProgressRepository;
+import com.studyflow.backend.quiz.repository.QuizRepository;
+import com.studyflow.backend.quiz.repository.QuizAttemptRepository;
 import java.util.List;
 
 @Service
@@ -25,15 +27,25 @@ public class CurriculumService {
     private final CourseRepository courseRepository;
     private final CourseModuleRepository moduleRepository;
     private final LectureRepository lectureRepository;
+    private final LectureProgressRepository lectureProgressRepository;
+    private final QuizRepository quizRepository;
+    private final QuizAttemptRepository quizAttemptRepository;
+
 
     public CurriculumService(
             CourseRepository courseRepository,
             CourseModuleRepository moduleRepository,
-            LectureRepository lectureRepository
+            LectureRepository lectureRepository,
+            LectureProgressRepository lectureProgressRepository,
+            QuizRepository quizRepository,
+            QuizAttemptRepository quizAttemptRepository
     ) {
         this.courseRepository = courseRepository;
         this.moduleRepository = moduleRepository;
         this.lectureRepository = lectureRepository;
+        this.lectureProgressRepository = lectureProgressRepository;
+        this.quizRepository = quizRepository;
+        this.quizAttemptRepository = quizAttemptRepository;
     }
 
     // =========================================================
@@ -327,6 +339,60 @@ public class CurriculumService {
         return LectureResponse.from(
                 lectureRepository.save(lecture)
         );
+    }
+
+    // =========================================================
+// ADMIN: DELETE EMPTY MODULE
+// =========================================================
+
+    @Transactional
+    public void deleteModule(Long moduleId) {
+
+        CourseModule module = findModuleOrThrow(moduleId);
+
+        boolean hasLectures =
+                lectureRepository.existsByModuleId(moduleId);
+
+        if (hasLectures) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "Cannot delete a module containing lectures. "
+                            + "Remove or manage its lectures first."
+            );
+        }
+
+        moduleRepository.delete(module);
+    }
+
+
+// =========================================================
+// ADMIN: DELETE UNUSED LECTURE
+// =========================================================
+
+    @Transactional
+    public void deleteLecture(Long lectureId) {
+
+        Lecture lecture = findLectureOrThrow(lectureId);
+
+        // Check whether students have learning progress.
+        if (lectureProgressRepository.existsByLectureId(lectureId)) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "Cannot delete this lecture because student "
+                            + "learning progress already exists."
+            );
+        }
+
+        // Check whether quizzes are associated with this lecture.
+        if (quizRepository.existsByLectureId(lectureId)) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "Cannot delete this lecture because quizzes "
+                            + "are associated with it."
+            );
+        }
+
+        lectureRepository.delete(lecture);
     }
 
     // =========================================================

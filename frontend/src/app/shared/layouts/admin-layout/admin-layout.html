@@ -1,0 +1,77 @@
+
+<div class="min-h-screen bg-background text-foreground md:flex">
+
+  <!-- Admin Sidebar -->
+  <aside class="w-full border-b border-border bg-surface p-5 md:min-h-screen md:w-64 md:border-b-0 md:border-r">
+
+    <h1 class="mb-8 text-2xl font-bold text-primary">
+      StudyFlow
+      <span class="block text-xs font-medium text-muted">
+        Administration
+      </span>
+    </h1>
+
+    <nav class="flex flex-wrap gap-2 md:flex-col">
+
+      <a routerLink="/admin/dashboard"
+         class="rounded-lg px-4 py-3 hover:bg-surface-secondary">
+        Dashboard
+      </a>
+
+      <a routerLink="/admin/users"
+         class="rounded-lg px-4 py-3 hover:bg-surface-secondary">
+        Users
+      </a>
+
+      <a routerLink="/admin/courses"
+         class="rounded-lg px-4 py-3 hover:bg-surface-secondary">
+        Courses
+      </a>
+
+      <a routerLink="/admin/exams"
+         class="rounded-lg px-4 py-3 hover:bg-surface-secondary">
+        Exams
+      </a>
+
+      <a routerLink="/admin/enrollments"
+         class="rounded-lg px-4 py-3 hover:bg-surface-secondary">
+        Enrollments
+      </a>
+
+      <a routerLink="/admin/reviews"
+         class="rounded-lg px-4 py-3 hover:bg-surface-secondary">
+        Reviews
+      </a>
+
+      <a routerLink="/admin/notifications"
+         class="rounded-lg px-4 py-3 hover:bg-surface-secondary">
+        Notifications
+      </a>
+
+      <a routerLink="/admin/reports"
+         class="rounded-lg px-4 py-3 hover:bg-surface-secondary">
+        Reports
+      </a>
+
+      <a routerLink="/admin/audit-logs"
+         class="rounded-lg px-4 py-3 hover:bg-surface-secondary">
+        Audit Logs
+      </a>
+
+    </nav>
+  </aside>
+
+  <!-- Admin Main Content -->
+  <div class="min-w-0 flex-1">
+
+    <header class="flex items-center justify-between border-b border-border bg-surface px-6 py-4">
+      <h2 class="font-semibold">Admin Panel</h2>
+      <app-theme-toggle />
+    </header>
+
+    <main class="p-6">
+      <router-outlet />
+    </main>
+
+  </div>
+</div>

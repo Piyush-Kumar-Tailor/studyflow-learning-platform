@@ -13,6 +13,9 @@ import com.studyflow.backend.quiz.repository.QuizAttemptRepository;
 import com.studyflow.backend.quiz.repository.QuizOptionRepository;
 import com.studyflow.backend.quiz.repository.QuizQuestionRepository;
 import com.studyflow.backend.quiz.repository.QuizRepository;
+import com.studyflow.backend.notification.dto.CreateNotificationRequest;
+import com.studyflow.backend.notification.service.NotificationService;
+
 
 import jakarta.persistence.EntityManager;
 
@@ -45,6 +48,7 @@ public class QuizAttemptService {
     private final QuizAttemptAnswerRepository answerRepository;
     private final QuizService quizService;
     private final EntityManager entityManager;
+    private final NotificationService notificationService;
 
     public QuizAttemptService(
             QuizRepository quizRepository,
@@ -53,8 +57,9 @@ public class QuizAttemptService {
             QuizAttemptRepository attemptRepository,
             QuizAttemptAnswerRepository answerRepository,
             QuizService quizService,
-            EntityManager entityManager) {
-
+            EntityManager entityManager,
+            NotificationService notificationService
+    ) {
         this.quizRepository = quizRepository;
         this.questionRepository = questionRepository;
         this.optionRepository = optionRepository;
@@ -62,6 +67,7 @@ public class QuizAttemptService {
         this.answerRepository = answerRepository;
         this.quizService = quizService;
         this.entityManager = entityManager;
+        this.notificationService = notificationService;
     }
 
     // --------------------------------------------------
@@ -304,6 +310,27 @@ public class QuizAttemptService {
         attempt.setStatus(QuizAttemptStatus.SUBMITTED);
 
         attemptRepository.save(attempt);
+
+// Generate automatic quiz result notification
+        String resultStatus = passed ? "Congratulations! You passed." :
+                "You did not pass this time. Keep practicing!";
+
+        String notificationMessage =
+                "You have completed the quiz: " + quiz.getTitle()
+                        + ". Your score: " + score
+                        + "/" + totalMarks
+                        + ". Percentage: " + percentage + "%"
+                        + ". " + resultStatus;
+
+        notificationService.createNotification(
+                userId,
+                new CreateNotificationRequest(
+                        "Quiz Result Available",
+                        notificationMessage,
+                        "QUIZ_RESULT",
+                        attempt.getId()
+                )
+        );
 
         return buildResultResponse(attempt, savedAnswers);
     }

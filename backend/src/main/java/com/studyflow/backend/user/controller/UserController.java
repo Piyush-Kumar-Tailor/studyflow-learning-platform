@@ -4,6 +4,7 @@ import com.studyflow.backend.user.dto.UpdateProfileRequest;
 import com.studyflow.backend.user.dto.UserProfileResponse;
 import com.studyflow.backend.user.entity.AppUser;
 import com.studyflow.backend.user.service.UserProfileService;
+import com.studyflow.backend.user.dto.CurrentUserResponse;
 
 import jakarta.validation.Valid;
 
@@ -39,6 +40,15 @@ public class UserController {
         AppUser user = getAuthenticatedUser(authentication);
 
         return userProfileService.updateProfile(user, request);
+    }
+
+    @GetMapping
+    public CurrentUserResponse getCurrentUser(
+            Authentication authentication
+    ) {
+        AppUser user = getAuthenticatedUser(authentication);
+
+        return CurrentUserResponse.from(user);
     }
 
     private AppUser getAuthenticatedUser(

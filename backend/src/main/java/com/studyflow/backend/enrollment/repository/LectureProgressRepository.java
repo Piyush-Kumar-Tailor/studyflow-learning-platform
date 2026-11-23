@@ -69,4 +69,24 @@ public interface LectureProgressRepository
             @Param("enrollmentId") Long enrollmentId,
             @Param("status") LectureProgressStatus status
     );
+
+    boolean existsByLectureId(Long lectureId);
+
+    // Count all lecture progress records for an enrollment.
+    long countByEnrollmentId(Long enrollmentId);
+
+    // Retrieve lecture progress ordered by module and lecture sequence.
+    @Query("""
+    SELECT p
+    FROM LectureProgress p
+    JOIN FETCH p.lecture l
+    JOIN FETCH l.module m
+    WHERE p.enrollment.id = :enrollmentId
+    ORDER BY m.sequenceNumber ASC, l.sequenceNumber ASC
+    """)
+    List<LectureProgress> findDetailedProgressByEnrollmentId(
+            @Param("enrollmentId") Long enrollmentId
+    );
+
+
 }

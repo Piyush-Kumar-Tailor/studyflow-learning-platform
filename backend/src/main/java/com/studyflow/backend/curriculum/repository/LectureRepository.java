@@ -70,4 +70,6 @@ public interface LectureRepository
     List<Lecture> findPublishedLecturesByCourseId(
             @Param("courseId") Long courseId
     );
+
+    boolean existsByModuleId(Long moduleId);
 }

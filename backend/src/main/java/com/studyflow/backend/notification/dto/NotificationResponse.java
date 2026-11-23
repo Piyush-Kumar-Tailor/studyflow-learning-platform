@@ -1,0 +1,15 @@
+package com.studyflow.backend.notification.dto;
+
+import java.time.LocalDateTime;
+
+public record NotificationResponse(
+        Long id,
+        String title,
+        String message,
+        String type,
+        Long referenceId,
+        boolean read,
+        LocalDateTime createdAt,
+        LocalDateTime readAt
+) {
+}

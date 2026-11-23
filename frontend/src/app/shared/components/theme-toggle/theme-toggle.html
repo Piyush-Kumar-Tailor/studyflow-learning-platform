@@ -1,0 +1,30 @@
+<button
+  type="button"
+  (click)="themeService.toggleTheme()"
+  [attr.aria-label]="
+    themeService.currentTheme() === 'dark'
+      ? 'Switch to light mode'
+      : 'Switch to dark mode'
+  "
+  [title]="
+    themeService.currentTheme() === 'dark'
+      ? 'Switch to light mode'
+      : 'Switch to dark mode'
+  "
+  class="inline-flex items-center justify-center gap-2
+         rounded-xl border border-border
+         bg-surface px-4 py-2
+         text-foreground transition-all duration-200
+         hover:bg-surface-secondary
+         focus-visible:outline-2
+         focus-visible:outline-offset-2
+         focus-visible:outline-primary"
+>
+  @if (themeService.currentTheme() === 'dark') {
+    <span aria-hidden="true">☀️</span>
+    <span class="text-sm font-medium">Light Mode</span>
+  } @else {
+    <span aria-hidden="true">🌙</span>
+    <span class="text-sm font-medium">Dark Mode</span>
+  }
+</button>

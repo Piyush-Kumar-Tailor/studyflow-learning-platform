@@ -16,6 +16,8 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
+import com.studyflow.backend.notification.dto.CreateNotificationRequest;
+import com.studyflow.backend.notification.service.NotificationService;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -27,15 +29,18 @@ public class EnrollmentService {
     private final CourseEnrollmentRepository enrollmentRepository;
     private final CourseRepository courseRepository;
     private final UserRepository userRepository;
+    private final NotificationService notificationService;
 
     public EnrollmentService(
             CourseEnrollmentRepository enrollmentRepository,
             CourseRepository courseRepository,
-            UserRepository userRepository
+            UserRepository userRepository,
+            NotificationService notificationService
     ) {
         this.enrollmentRepository = enrollmentRepository;
         this.courseRepository = courseRepository;
         this.userRepository = userRepository;
+        this.notificationService = notificationService;
     }
 
     @Transactional
@@ -64,11 +69,25 @@ public class EnrollmentService {
         CourseEnrollment enrollment = new CourseEnrollment(user, course);
 
         try {
-            return EnrollmentResponse.from(
-                    enrollmentRepository.saveAndFlush(enrollment)
+            CourseEnrollment savedEnrollment =
+                    enrollmentRepository.saveAndFlush(enrollment);
+
+            notificationService.createNotification(
+                    userId,
+                    new CreateNotificationRequest(
+                            "Enrollment Successful",
+                            "You have successfully enrolled in "
+                                    + course.getTitle()
+                                    + ". Start learning now!",
+                            "ENROLLMENT",
+                            course.getId()
+                    )
             );
+
+            return EnrollmentResponse.from(savedEnrollment);
+
         } catch (DataIntegrityViolationException exception) {
-            // Handles a concurrent request that creates the same enrollment.
+
             throw new ResponseStatusException(
                     HttpStatus.CONFLICT,
                     "You are already enrolled in this course"

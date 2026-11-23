@@ -28,4 +28,6 @@ public interface LectureNoteRepository
     );
 
     long countByUserId(Long userId);
+
+    boolean existsByLectureId(Long lectureId);
 }

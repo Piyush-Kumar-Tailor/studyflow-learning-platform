@@ -1,0 +1,560 @@
+@if (!loading() && hasNoEnrollments()) {
+<section class="learning-empty-state">
+  <div class="empty-state-glow empty-state-glow-one"></div>
+  <div class="empty-state-glow empty-state-glow-two"></div>
+
+  <div class="empty-state-content">
+    <div class="empty-state-illustration">
+      <div class="empty-state-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" width="58" height="58" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="m12 3 9 5-9 5-9-5 9-5Z"></path>
+          <path d="m3 12 9 5 9-5"></path>
+          <path d="m3 16 9 5 9-5"></path>
+        </svg>
+      </div>
+      <span class="empty-state-sparkle sparkle-one">✦</span>
+      <span class="empty-state-sparkle sparkle-two">✧</span>
+      <span class="empty-state-sparkle sparkle-three">✦</span>
+    </div>
+
+    <span class="empty-state-eyebrow">YOUR LEARNING JOURNEY STARTS HERE</span>
+
+    <h1>Every expert was once a beginner.</h1>
+
+    <p>
+      You haven't enrolled in any courses yet. Discover something exciting,
+      learn at your own pace, and turn your goals into progress with StudyFlow.
+    </p>
+
+    <a routerLink="/student/courses" class="empty-state-cta">
+      Explore Courses
+      <span aria-hidden="true">→</span>
+    </a>
+
+    <div class="empty-state-footer">
+      <span>Discover</span>
+      <span class="empty-state-dot"></span>
+      <span>Learn</span>
+      <span class="empty-state-dot"></span>
+      <span>Grow</span>
+    </div>
+  </div>
+</section>
+} @else if (!loading() && courseNotEnrolled()) {
+<section class="learning-empty-state">
+  <div class="empty-state-content">
+    <div class="empty-state-illustration">
+      <div class="empty-state-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" width="58" height="58" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+          <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2Z"></path>
+        </svg>
+      </div>
+    </div>
+
+    <span class="empty-state-eyebrow">LET'S GET YOU BACK ON TRACK</span>
+    <h1>This course isn't in your learning list.</h1>
+    <p>
+      Choose one of your enrolled courses below to continue learning.
+    </p>
+
+    <div class="not-enrolled-course-list">
+      @for (enrollment of enrolledCourses(); track enrollment.id) {
+      <button type="button" class="not-enrolled-course" (click)="switchCourse(enrollment.courseId)">
+        <span class="not-enrolled-course-icon">▶</span>
+        <span class="not-enrolled-course-name">
+          {{ enrollment.courseTitle }}
+        </span>
+        <span aria-hidden="true">→</span>
+      </button>
+      }
+    </div>
+
+    <a routerLink="/student/courses" class="empty-state-secondary-link">
+      Explore more courses
+    </a>
+  </div>
+</section>
+} @else {
+
+<div class="learning-studio space-y-7">
+
+  <!-- Breadcrumb -->
+  <nav class="flex flex-wrap items-center gap-2 text-xs font-medium text-muted">
+    <a routerLink="/student/dashboard" class="transition hover:text-primary">Dashboard</a>
+    <span>/</span>
+    <a routerLink="/student/courses" class="transition hover:text-primary">Courses</a>
+    <span>/</span>
+    <span class="text-foreground">Learning Studio</span>
+  </nav>
+
+  @if (enrolledCourses().length > 1) {
+  <section class="enrolled-course-switcher">
+    <div class="course-switcher-heading">
+      <div>
+        <span class="course-switcher-eyebrow">YOUR LIBRARY</span>
+        <h2>Switch learning path</h2>
+      </div>
+      <span class="course-switcher-count">
+        {{ enrolledCourses().length }} courses
+      </span>
+    </div>
+
+    <div class="course-switcher-list">
+      @for (enrollment of enrolledCourses(); track enrollment.id) {
+      <button type="button" class="course-switcher-item"
+        [class.course-switcher-item-active]="enrollment.id === enrollmentId()"
+        [attr.aria-current]="enrollment.id === enrollmentId() ? 'page' : null"
+        (click)="switchCourse(enrollment.courseId)">
+        <span class="course-switcher-status"></span>
+        <span class="course-switcher-name">
+          {{ enrollment.courseTitle }}
+        </span>
+        @if (enrollment.id === enrollmentId()) {
+        <span class="course-switcher-current">Currently learning</span>
+        }
+      </button>
+      }
+    </div>
+  </section>
+  }
+
+  <!-- Immersive course hero -->
+  <section class="studio-hero relative overflow-hidden rounded-[30px] p-6 text-white sm:p-9">
+    <div class="hero-orb hero-orb-one"></div>
+    <div class="hero-orb hero-orb-two"></div>
+    <div class="hero-grid"></div>
+
+    <div class="relative z-10 flex flex-col justify-between gap-8 lg:flex-row lg:items-end">
+      <div class="max-w-2xl">
+        <div
+          class="mb-5 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1.5 text-[10px] font-bold tracking-[0.2em] text-white/90 backdrop-blur-md">
+          <span class="h-2 w-2 animate-pulse rounded-full bg-emerald-300"></span>
+          YOUR PERSONAL LEARNING STUDIO
+        </div>
+
+        <h1 class="text-3xl font-black leading-tight tracking-tight sm:text-4xl lg:text-5xl">
+          {{ courseTitle }}
+        </h1>
+
+        <p class="mt-4 max-w-xl text-sm leading-7 text-indigo-100/80 sm:text-base">
+          Every lesson brings you closer to your goal. Stay curious, keep learning, and make every session count.
+        </p>
+
+        <div class="mt-7 flex flex-wrap items-center gap-3">
+          <span class="rounded-xl border border-white/15 bg-white/10 px-4 py-2 text-xs font-semibold backdrop-blur">
+            ✦ Focus mode
+          </span>
+          <span class="rounded-xl border border-white/15 bg-white/10 px-4 py-2 text-xs font-semibold backdrop-blur">
+            {{ totalLectures() }} lessons
+          </span>
+          <a routerLink="/student/courses"
+            class="rounded-xl bg-white px-4 py-2 text-xs font-bold text-indigo-800 shadow-lg transition hover:-translate-y-1 hover:shadow-xl">
+            Explore courses ↗
+          </a>
+        </div>
+      </div>
+
+      <div class="hero-progress-card relative w-full max-w-57.5 self-start lg:self-auto">
+        <p class="text-xs font-semibold tracking-wider text-white/70">YOUR JOURNEY</p>
+        <div class="mt-4 flex items-end justify-between">
+          <span class="text-5xl font-black tracking-tighter">{{ backendProgressPercentage() }}%</span>
+          <span class="mb-1 text-xs text-indigo-100/80">completed</span>
+        </div>
+        <div class="mt-4 h-2 overflow-hidden rounded-full bg-white/20">
+          <div class="h-full rounded-full bg-linear-to-r from-emerald-300 to-cyan-300 transition-all duration-700"
+            [style.width.%]="backendProgressPercentage()"></div>
+        </div>
+        <p class="mt-3 text-xs text-indigo-100/80">
+          {{ backendCompletedLectures() }} of
+          {{ backendTotalLectures() }} lectures completed
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Loading state -->
+  @if (loading()) {
+  <section class="grid gap-5 xl:grid-cols-[1fr_340px]">
+    <div class="sf-card animate-pulse p-5">
+      <div class="aspect-video rounded-2xl bg-surface-secondary"></div>
+      <div class="mt-5 h-5 w-2/3 rounded bg-surface-secondary"></div>
+      <div class="mt-3 h-4 w-1/3 rounded bg-surface-secondary"></div>
+    </div>
+    <div class="sf-card animate-pulse p-5">
+      <div class="h-6 w-1/2 rounded bg-surface-secondary"></div>
+      <div class="mt-6 space-y-4">
+        @for (item of [1,2,3,4,5]; track item) {
+        <div class="h-12 rounded-xl bg-surface-secondary"></div>
+        }
+      </div>
+    </div>
+  </section>
+  }
+
+  <!-- Error state -->
+  @else if (errorMessage()) {
+  <section class="sf-card flex flex-col items-center px-6 py-16 text-center">
+    <div class="flex h-16 w-16 items-center justify-center rounded-2xl bg-danger/10 text-3xl">!</div>
+    <h2 class="mt-5 text-xl font-bold">We couldn't open your learning studio</h2>
+    <p class="mt-2 max-w-md text-sm leading-6 text-muted">{{ errorMessage() }}</p>
+    <button type="button" (click)="loadCurriculum()" class="sf-primary-button mt-6">
+      Try again
+    </button>
+  </section>
+  }
+
+  <!-- Empty curriculum -->
+  @else if (totalLectures() === 0) {
+  <section class="sf-card flex flex-col items-center px-6 py-16 text-center">
+    <div class="flex h-20 w-20 items-center justify-center rounded-3xl bg-primary/10 text-4xl">📚</div>
+    <h2 class="mt-5 text-xl font-bold">Your classroom is getting ready</h2>
+    <p class="mt-2 max-w-md text-sm leading-6 text-muted">
+      There are no published lessons in this course yet. Check back when your instructor adds the curriculum.
+    </p>
+    <a routerLink="/student/courses" class="sf-primary-button mt-6">Explore other courses</a>
+  </section>
+  }
+
+  @else {
+  <!-- Quick stats -->
+  <section class="grid grid-cols-2 gap-3 lg:grid-cols-4">
+    <div class="stat-tile">
+      <span class="stat-icon bg-primary/10 text-primary">◈</span>
+      <div>
+        <p class="text-xl font-black">{{ totalLectures() }}</p>
+        <p class="text-xs text-muted">Total lessons</p>
+      </div>
+    </div>
+    <div class="stat-tile">
+      <span class="stat-icon bg-emerald-500/10 text-emerald-500">✓</span>
+      <div>
+        <p class="text-xl font-black">{{ completedCount() }}</p>
+        <p class="text-xs text-muted">Completed</p>
+      </div>
+    </div>
+    <div class="stat-tile">
+      <span class="stat-icon bg-amber-500/10 text-amber-500">◷</span>
+      <div>
+        <p class="text-xl font-black">{{ totalLectures() - completedCount() }}</p>
+        <p class="text-xs text-muted">Remaining</p>
+      </div>
+    </div>
+    <div class="stat-tile">
+      <span class="stat-icon bg-cyan-500/10 text-cyan-500">✦</span>
+      <div>
+        <p class="text-xl font-black">{{ backendProgressPercentage() }}%</p>
+        <p class="text-xs text-muted">Course progress</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main learning layout -->
+  <section class="grid items-start gap-6 2xl:grid-cols-[minmax(0,1fr)_370px]">
+
+    <!-- Main lesson column -->
+    <div class="min-w-0 space-y-6">
+
+      <!-- Video player -->
+      <div class="player-shell">
+        <div class="flex items-center justify-between gap-3 border-b border-white/10 px-4 py-3 sm:px-5">
+          <div class="flex items-center gap-2">
+            <span class="h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_12px_rgba(52,211,153,0.8)]"></span>
+            <span class="text-xs font-bold tracking-wider text-white">NOW LEARNING</span>
+          </div>
+          <span
+            class="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[10px] font-semibold text-slate-300">
+            STUDYFLOW PLAYER
+          </span>
+        </div>
+
+        <div class="relative aspect-video overflow-hidden bg-[#080D1B]">
+          @if (videoEmbedUrl()) {
+          <iframe #youtubeFrame class="absolute inset-0 h-full w-full" [src]="videoEmbedUrl()"
+            [title]="selectedLecture()?.title ?? 'Course lecture'" (load)="initializeYoutubePlayer()"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            referrerpolicy="strict-origin-when-cross-origin" allowfullscreen>
+          </iframe>
+
+          } @else {
+          <div class="player-empty absolute inset-0 flex flex-col items-center justify-center px-5 text-center">
+            <div class="player-play-icon">▶</div>
+            <p class="mt-6 text-lg font-bold text-white">
+              Video coming soon
+            </p>
+            <p class="mt-2 max-w-sm text-xs leading-6 text-slate-400">
+              Your instructor hasn't added a YouTube video to this lesson yet. You can still explore the lesson details
+              and take notes.
+            </p>
+          </div>
+          }
+        </div>
+
+        <div
+          class="flex flex-wrap items-center justify-between gap-3 border-t border-white/10 bg-[#111A30] px-4 py-3 sm:px-5">
+          <div class="min-w-0">
+            <p class="text-[10px] font-bold tracking-[0.18em] text-indigo-300">CURRENT LESSON</p>
+            <p class="mt-1 truncate text-sm font-semibold text-white">
+              {{ selectedLecture()?.title }}
+            </p>
+          </div>
+          <span class="rounded-lg bg-white/5 px-3 py-2 text-xs text-slate-300">
+            ◷ {{ selectedLecture()?.duration }}
+          </span>
+        </div>
+      </div>
+
+      <!-- Lesson details -->
+      <section class="sf-card overflow-hidden">
+        <div class="p-5 sm:p-7">
+          <div class="flex flex-wrap items-start justify-between gap-4">
+            <div class="min-w-0 flex-1">
+              <div class="flex flex-wrap items-center gap-2">
+                <span
+                  class="rounded-full bg-primary/10 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-primary">
+                  Lesson {{ allLectures().findIndex(l => l.id === selectedLectureId()) + 1 }}
+                </span>
+                @if (selectedLecture()?.completed) {
+                <span class="rounded-full bg-emerald-500/10 px-3 py-1 text-[10px] font-bold text-emerald-500">
+                  ✓ Completed
+                </span>
+                } @else {
+                <span
+                  class="rounded-full bg-amber-500/10 px-3 py-1 text-[10px] font-bold text-amber-600 dark:text-amber-300">
+                  IN PROGRESS
+                </span>
+                }
+              </div>
+
+              <h2 class="mt-4 text-2xl font-black tracking-tight sm:text-3xl">
+                {{ selectedLecture()?.title }}
+              </h2>
+
+              <p class="mt-3 text-sm leading-7 text-muted">
+                {{ selectedLecture()?.description || 'Focus on understanding the key concepts in this lesson. Take
+                notes, review the material, and mark the lesson complete when you are ready.' }}
+              </p>
+            </div>
+
+            <button type="button" (click)="toggleBookmark()" [attr.aria-pressed]="isBookmarked()"
+              class="bookmark-button" [class.bookmark-active]="isBookmarked()">
+              <span class="text-lg">{{ isBookmarked() ? '★' : '☆' }}</span>
+              {{ isBookmarked() ? 'Saved' : 'Save lesson' }}
+            </button>
+          </div>
+
+          <!-- Completion control -->
+          <div class="completion-panel mt-7">
+            <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div class="flex items-center gap-3">
+                <div class="completion-icon" [class.completion-icon-done]="selectedLecture()?.completed">
+                  {{ selectedLecture()?.completed ? '✓' : '◎' }}
+                </div>
+                <div class="mt-3 rounded-xl border border-border bg-surface-secondary p-3 text-xs">
+                  <p>Enrollment ID: {{ enrollmentId() }}</p>
+                  <p>Enrollment Status: {{ enrollmentStatus() }}</p>
+                  <p>Selected Lecture: {{ selectedLecture()?.id }}</p>
+                  <p>Already Completed: {{ selectedLecture()?.completed }}</p>
+                  <p>Saving: {{ isSavingProgress() }}</p>
+                </div>
+                <div>
+                  <p class="text-sm font-bold">
+                    {{ selectedLecture()?.completed ? 'Lesson completed!' : 'Finished this lesson?' }}
+                  </p>
+                  <p class="mt-1 text-xs text-muted">
+                    {{ selectedLecture()?.completed
+                    ? 'This lesson has been saved as completed.'
+                    : 'Mark it complete to track your learning progress.' }}
+                  </p>
+                </div>
+              </div>
+
+              <button type="button" (click)="markAsCompleted()" [disabled]="
+    !selectedLecture() ||
+    selectedLecture()?.completed ||
+    isSavingProgress() ||
+    !enrollmentId() ||
+    enrollmentStatus() !== 'IN_PROGRESS'
+  " class="rounded-xl bg-primary px-5 py-3 font-semibold text-primary-foreground
+         transition-all duration-200 hover:bg-primary-hover
+         disabled:cursor-not-allowed disabled:opacity-60">
+                @if (isSavingProgress()) {
+                Saving...
+                } @else if (selectedLecture()?.completed) {
+                ✓ Completed
+                } @else {
+                Mark as Completed
+                }
+              </button>
+
+              @if (progressSuccess()) {
+              <p class="mt-3 text-sm text-success">
+                {{ progressSuccess() }}
+              </p>
+              }
+
+              @if (progressError()) {
+              <p class="mt-3 text-sm text-danger">
+                {{ progressError() }}
+              </p>
+              }
+            </div>
+          </div>
+
+          <!-- Lesson navigation -->
+          <div class="mt-6 flex flex-wrap items-center justify-between gap-3 border-t border-border pt-6">
+            <button type="button" (click)="selectPreviousLecture()"
+              [disabled]="selectedLectureId() === allLectures()[0]?.id" class="lesson-nav-button">
+              ← Previous lesson
+            </button>
+
+            <p class="text-xs font-medium text-muted">
+              {{ allLectures().findIndex(l => l.id === selectedLectureId()) + 1 }}
+              / {{ totalLectures() }} lessons
+            </p>
+
+            <button type="button" (click)="selectNextLecture()"
+              [disabled]="selectedLectureId() === allLectures()[allLectures().length - 1]?.id"
+              class="lesson-nav-button lesson-nav-next">
+              Next lesson →
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Notes -->
+      <section class="sf-card overflow-hidden">
+        <div class="flex flex-wrap items-center justify-between gap-3 border-b border-border p-5 sm:px-7">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="text-xl">✎</span>
+              <h2 class="text-lg font-black">Your Learning Notes</h2>
+            </div>
+            <p class="mt-1 text-xs text-muted">Capture ideas before they disappear.</p>
+          </div>
+          <span class="rounded-full bg-primary/10 px-3 py-1.5 text-[10px] font-bold text-primary">
+            PERSONAL NOTES
+          </span>
+        </div>
+
+        <div class="p-5 sm:p-7">
+          <textarea rows="5" [ngModel]="notes()" (ngModelChange)="notes.set($event)"
+            placeholder="Write your key takeaways, examples, questions, or important concepts here..."
+            class="notes-editor w-full">
+            </textarea>
+
+          <div class="mt-3 flex flex-wrap items-center justify-between gap-3">
+            <p class="text-[11px] text-muted">Your notes are currently stored in this session.</p>
+            <button type="button" (click)="saveNote()" [disabled]="!notes().trim()"
+              class="sf-primary-button disabled:cursor-not-allowed disabled:opacity-40">
+              + Save note
+            </button>
+          </div>
+
+          @if (savedNotes().length > 0) {
+          <div class="mt-7 border-t border-border pt-5">
+            <h3 class="text-sm font-bold">Saved notes · {{ savedNotes().length }}</h3>
+            <div class="mt-4 grid gap-3">
+              @for (note of savedNotes(); track $index) {
+              <article class="saved-note">
+                <div class="flex items-center justify-between gap-3">
+                  <span class="text-[10px] font-bold uppercase tracking-wider text-primary">NOTE {{ $index + 1 }}</span>
+                  <span class="text-xs text-muted">✦</span>
+                </div>
+                <p class="mt-2 whitespace-pre-wrap text-sm leading-6">{{ note }}</p>
+              </article>
+              }
+            </div>
+          </div>
+          }
+        </div>
+      </section>
+    </div>
+
+    <!-- Curriculum sidebar -->
+    <aside class="curriculum-panel">
+      <div class="curriculum-heading">
+        <div class="flex items-center justify-between gap-3">
+          <div>
+            <p class="text-[10px] font-bold tracking-[0.18em] text-primary">YOUR ROADMAP</p>
+            <h2 class="mt-1 text-xl font-black">Course Content</h2>
+          </div>
+          <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-primary/10 text-xl text-primary">☷</div>
+        </div>
+
+        <div class="mt-5 flex items-center justify-between text-xs">
+          <span class="text-muted">{{ completedCount() }} of {{ totalLectures() }} completed</span>
+          <span class="font-bold text-primary">{{ backendProgressPercentage() }}%</span>
+        </div>
+        <div class="mt-2 h-2 overflow-hidden rounded-full bg-surface-secondary">
+          <div class="h-full rounded-full bg-gradient-to-r from-primary to-accent transition-all duration-700"
+            [style.width.%]="backendProgressPercentage()"></div>
+        </div>
+      </div>
+
+      <div class="max-h-[760px] space-y-3 overflow-y-auto p-3">
+        @for (module of modules(); track module.id; let moduleIndex = $index) {
+        <div class="module-card" [class.module-card-open]="expandedModuleId() === module.id">
+
+          <button type="button" (click)="toggleModule(module.id)" class="flex w-full items-center gap-3 p-4 text-left"
+            [attr.aria-expanded]="expandedModuleId() === module.id">
+
+            <div class="module-number">
+              {{ moduleIndex + 1 }}
+            </div>
+
+            <div class="min-w-0 flex-1">
+              <p class="line-clamp-2 text-sm font-bold leading-5">{{ module.title }}</p>
+              <p class="mt-1 text-[11px] text-muted">
+                {{ module.lectures.length }} lessons
+                · {{ module.lectures.filter(l => l.completed).length }} done
+              </p>
+            </div>-
+
+            <span class="text-lg text-primary transition-transform"
+              [class.rotate-180]="expandedModuleId() === module.id">⌄</span>
+          </button>
+
+          @if (expandedModuleId() === module.id) {
+          <div class="module-lessons">
+            @for (lecture of module.lectures; track lecture.id; let lessonIndex = $index) {
+            <button type="button" (click)="selectLecture(lecture.id, module.id)" class="lesson-item"
+              [class.lesson-item-active]="selectedLectureId() === lecture.id"
+              [class.lesson-item-done]="lecture.completed">
+
+              <span class="lesson-status" [class.lesson-status-done]="lecture.completed"
+                [class.lesson-status-active]="selectedLectureId() === lecture.id">
+                {{ lecture.completed ? '✓' : lessonIndex + 1 }}
+              </span>
+
+              <span class="min-w-0 flex-1">
+                <span class="block text-xs font-semibold leading-5">{{ lecture.title }}</span>
+                <span class="mt-1 block text-[10px] text-muted">{{ lecture.duration }}</span>
+              </span>
+
+              @if (selectedLectureId() === lecture.id) {
+              <span class="active-indicator"></span>
+              }
+            </button>
+            }
+          </div>
+          }
+        </div>
+        }
+      </div>
+
+      <div class="border-t border-border p-4">
+        <div class="rounded-2xl bg-primary/5 p-4">
+          <p class="text-xs font-bold">✦ Keep your momentum</p>
+          <p class="mt-1 text-[11px] leading-5 text-muted">
+            A little progress every day builds extraordinary results.
+          </p>
+        </div>
+      </div>
+    </aside>
+  </section>
+  }
+</div>
+}

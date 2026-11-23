@@ -28,4 +28,10 @@ public interface QuizQuestionRepository
 
     // Count questions belonging to a quiz.
     long countByQuizId(Long quizId);
+
+    boolean existsByQuizIdAndSequenceNumberAndIdNot(
+            Long quizId,
+            Integer sequenceNumber,
+            Long questionId
+    );
 }

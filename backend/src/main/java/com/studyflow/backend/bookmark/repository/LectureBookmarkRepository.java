@@ -26,4 +26,6 @@ public interface LectureBookmarkRepository
     void deleteByUserIdAndLectureId(Long userId, Long lectureId);
 
     long countByUserId(Long userId);
+
+    boolean existsByLectureId(Long lectureId);
 }

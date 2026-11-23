@@ -41,4 +41,6 @@ public interface CourseModuleRepository
     );
 
     Optional<CourseModule> findByIdAndPublishedTrue(Long id);
+
+    boolean existsByCourseId(Long courseId);
 }

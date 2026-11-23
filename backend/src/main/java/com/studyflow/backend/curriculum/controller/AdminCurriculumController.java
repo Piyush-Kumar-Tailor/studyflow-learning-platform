@@ -83,4 +83,25 @@ public class AdminCurriculumController {
                 request.published()
         );
     }
+
+    // DELETE /api/v1/admin/modules/{id}
+
+    @DeleteMapping("/modules/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteModule(
+            @PathVariable Long id
+    ) {
+        curriculumService.deleteModule(id);
+    }
+
+
+// DELETE /api/v1/admin/lectures/{id}
+
+    @DeleteMapping("/lectures/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteLecture(
+            @PathVariable Long id
+    ) {
+        curriculumService.deleteLecture(id);
+    }
 }

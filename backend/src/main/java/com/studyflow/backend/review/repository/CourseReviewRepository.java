@@ -49,4 +49,28 @@ public interface CourseReviewRepository
        WHERE r.course.id = :courseId
        """)
     Long sumRatingByCourseId(@Param("courseId") Long courseId);
+    boolean existsByCourseId(Long courseId);
+
+    // Find reviews by course and rating.
+    Page<CourseReview> findByCourseIdAndRatingOrderByCreatedAtDesc(
+            Long courseId,
+            Short rating,
+            Pageable pageable
+    );
+
+    // Find reviews by rating across all courses.
+    Page<CourseReview> findByRatingOrderByCreatedAtDesc(
+            Short rating,
+            Pageable pageable
+    );
+
+    // Total number of course reviews.
+    long count();
+
+    // Average rating across all course reviews.
+    @Query("SELECT AVG(r.rating) FROM CourseReview r")
+    Double findAverageRating();
+
+    // Number of reviews for each rating.
+    long countByRating(Short rating);
 }

@@ -1,0 +1,711 @@
+<!-- Scoped animation helpers (pure CSS, no component changes needed) -->
+<style>
+  @keyframes cd-fade-up {
+    from {
+      opacity: 0;
+      transform: translateY(18px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes cd-float {
+
+    0%,
+    100% {
+      transform: translateY(0) rotate(-2deg);
+    }
+
+    50% {
+      transform: translateY(-14px) rotate(2deg);
+    }
+  }
+
+  @keyframes cd-drift {
+
+    0%,
+    100% {
+      transform: translate(0, 0) scale(1);
+    }
+
+    50% {
+      transform: translate(24px, -18px) scale(1.12);
+    }
+  }
+
+  @keyframes cd-shine {
+    0% {
+      transform: translateX(-120%) skewX(-20deg);
+    }
+
+    100% {
+      transform: translateX(260%) skewX(-20deg);
+    }
+  }
+
+  @keyframes cd-ring {
+    0% {
+      transform: scale(.9);
+      opacity: .55;
+    }
+
+    100% {
+      transform: scale(1.5);
+      opacity: 0;
+    }
+  }
+
+  .cd-fade-up {
+    opacity: 0;
+    animation: cd-fade-up .6s cubic-bezier(.2, .7, .2, 1) forwards;
+  }
+
+  .cd-float {
+    animation: cd-float 6s ease-in-out infinite;
+  }
+
+  .cd-drift {
+    animation: cd-drift 9s ease-in-out infinite;
+  }
+
+  .cd-drift-2 {
+    animation: cd-drift 12s ease-in-out infinite reverse;
+  }
+
+  .cd-ring {
+    animation: cd-ring 2.4s ease-out infinite;
+  }
+
+  .cd-shine::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    width: 40%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .35), transparent);
+    animation: cd-shine 3.2s ease-in-out infinite;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+
+    .cd-fade-up,
+    .cd-float,
+    .cd-drift,
+    .cd-drift-2,
+    .cd-ring,
+    .cd-shine::after {
+      animation: none !important;
+      opacity: 1 !important;
+    }
+  }
+</style>
+
+<!-- Loading State -->
+@if (loading()) {
+<section class="relative flex min-h-[420px] flex-col items-center justify-center
+                  overflow-hidden rounded-3xl border border-border bg-surface p-10 text-center">
+
+  <div class="cd-drift pointer-events-none absolute -left-16 -top-16 h-64 w-64
+                rounded-full bg-primary/10 blur-3xl"></div>
+  <div class="cd-drift-2 pointer-events-none absolute -bottom-20 -right-10 h-64 w-64
+                rounded-full bg-primary/10 blur-3xl"></div>
+
+  <div class="relative flex h-20 w-20 items-center justify-center">
+    <span class="cd-ring absolute inset-0 rounded-full border-2 border-primary/40"></span>
+    <div class="h-16 w-16 animate-spin rounded-full border-4
+                  border-primary/20 border-t-primary"></div>
+    <span class="absolute text-xl">📚</span>
+  </div>
+
+  <h2 class="relative mt-6 text-lg font-bold">Loading course details...</h2>
+
+  <p class="relative mt-2 text-sm text-muted">
+    Please wait while we prepare your learning experience.
+  </p>
+
+</section>
+}
+
+<!-- Error State -->
+@else if (errorMessage()) {
+<section class="relative overflow-hidden rounded-3xl border border-rose-500/20
+                  bg-surface p-10 text-center">
+
+  <div class="pointer-events-none absolute -top-24 left-1/2 h-56 w-56 -translate-x-1/2
+                rounded-full bg-rose-500/10 blur-3xl"></div>
+
+  <div class="relative mx-auto flex h-16 w-16 items-center justify-center
+                rounded-2xl bg-rose-500/10 text-3xl">
+    ⚠️
+  </div>
+
+  <h2 class="relative mt-5 text-2xl font-bold">Unable to load course</h2>
+
+  <p class="relative mt-3 text-sm text-muted">
+    {{ errorMessage() }}
+  </p>
+
+  <div class="relative mt-6 flex flex-wrap items-center justify-center gap-3">
+
+    <button type="button" (click)="retryLoading()" class="sf-primary-button">
+
+      Try Again
+
+    </button>
+
+    <a routerLink="/student/courses" class="inline-flex rounded-xl border border-border
+               px-5 py-3 text-sm font-semibold transition
+               hover:bg-surface-secondary">
+
+      Back to Courses
+
+    </a>
+
+  </div>
+
+</section>
+}
+
+<!-- Course Details -->
+@else if (course(); as course) {
+
+<div class="space-y-8">
+
+  <!-- Breadcrumb -->
+  <nav class="cd-fade-up flex flex-wrap items-center gap-2 text-sm text-muted">
+
+    <a routerLink="/student/dashboard" class="transition hover:text-primary">
+      Dashboard
+    </a>
+
+    <span class="opacity-50">/</span>
+
+    <a routerLink="/student/courses" class="transition hover:text-primary">
+      Courses
+    </a>
+
+    <span class="opacity-50">/</span>
+
+    <span class="font-medium text-foreground">
+      {{ course.title }}
+    </span>
+
+  </nav>
+
+  <!-- Course Hero -->
+  <section class="cd-fade-up relative overflow-hidden rounded-[32px]
+                    bg-gradient-to-br from-[#2a2842] via-[#201d3f] to-[#3d3778]
+                    p-7 text-white shadow-2xl shadow-[#5546D9]/30 sm:p-12" style="animation-delay: 80ms">
+
+    <!-- Decorative background -->
+    <div class="pointer-events-none absolute -right-24 -top-28
+                  h-96 w-96 rounded-full border-[56px] border-white/10"></div>
+    <div class="cd-drift pointer-events-none absolute -bottom-24 -left-16
+                  h-72 w-72 rounded-full bg-white/10 blur-3xl"></div>
+    <div class="cd-drift-2 pointer-events-none absolute right-1/3 top-10
+                  h-40 w-40 rounded-full bg-fuchsia-400/20 blur-3xl"></div>
+    <div class="pointer-events-none absolute inset-0 opacity-[0.07]
+                  [background-image:radial-gradient(#fff_1px,transparent_1px)]
+                  [background-size:22px_22px]"></div>
+
+    <div class="relative grid items-center gap-10 lg:grid-cols-[1fr_300px]">
+
+      <div>
+
+        <span class="inline-flex items-center gap-2 rounded-full border border-white/25
+                       bg-white/10 px-4 py-1.5 text-xs font-semibold backdrop-blur-md">
+          <span class="relative flex h-2 w-2">
+            <span class="absolute inline-flex h-full w-full animate-ping rounded-full
+                           bg-emerald-300 opacity-75"></span>
+            <span class="relative inline-flex h-2 w-2 rounded-full bg-emerald-300"></span>
+          </span>
+          {{ course.category }}
+        </span>
+
+        <h1 class="mt-6 max-w-2xl text-3xl font-extrabold leading-[1.15]
+                     tracking-tight sm:text-5xl">
+          {{ course.title }}
+        </h1>
+
+        <p class="mt-5 max-w-2xl text-sm leading-7 text-white/80 sm:text-base">
+          {{ course.description }}
+        </p>
+
+        <div class="mt-7 flex flex-wrap gap-3 text-sm">
+
+          <span class="inline-flex items-center gap-2 rounded-full border border-white/20
+                         bg-white/10 px-4 py-2 backdrop-blur-md transition
+                         hover:-translate-y-0.5 hover:bg-white/20">
+            🎯 {{ course.level }}
+          </span>
+
+          <span class="inline-flex items-center gap-2 rounded-full border border-white/20
+                         bg-white/10 px-4 py-2 backdrop-blur-md transition
+                         hover:-translate-y-0.5 hover:bg-white/20">
+            🌐 {{ course.language }}
+          </span>
+
+          <span class="inline-flex items-center gap-2 rounded-full border border-white/20
+                         bg-white/10 px-4 py-2 backdrop-blur-md transition
+                         hover:-translate-y-0.5 hover:bg-white/20">
+            📚 {{ course.lessons }} Lessons
+          </span>
+
+        </div>
+
+        <!-- Enrollment will be connected in the next step -->
+        <div class="mt-8 flex flex-wrap items-center gap-3">
+
+          @if (enrollment()) {
+          <button type="button" [routerLink]="['/student/learning', course.id]"
+            class="w-full rounded-xl bg-primary px-6 py-3 font-semibold text-primary-foreground transition hover:opacity-90">
+            Continue Learning
+          </button>
+          } @else {
+          <button type="button" (click)="enrollInCourse()" [disabled]="isEnrolling() || !course"
+            class="w-full rounded-xl bg-primary px-6 py-3 font-semibold text-primary-foreground transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50">
+            @if (isEnrolling()) {
+            Enrolling...
+            } @else {
+            Enroll Now
+            }
+          </button>
+          }
+
+          @if (enrollmentError()) {
+          <p class="mt-3 text-sm text-red-500">
+            {{ enrollmentError() }}
+          </p>
+          }
+
+          @if (enrollmentSuccess()) {
+          <p class="mt-3 text-sm text-green-600">
+            {{ enrollmentSuccess() }}
+          </p>
+          }
+
+        </div>
+
+      </div>
+
+      <!-- Course Illustration -->
+      <div class="hidden items-center justify-center lg:flex">
+
+        <div class="relative">
+
+          <div class="cd-ring absolute inset-0 rounded-[36px] border-2 border-white/40"></div>
+          <div class="absolute -inset-6 rounded-[44px] bg-white/10 blur-2xl"></div>
+
+          @if (course.thumbnailUrl) {
+
+          <img [src]="course.thumbnailUrl" [alt]="course.title" class="cd-float relative h-56 w-56 rounded-[36px] border border-white/30
+                       object-cover shadow-2xl">
+
+          } @else {
+
+          <div class="cd-float relative flex h-56 w-56 flex-col items-center
+                          justify-center rounded-[36px] border border-white/30
+                          bg-white/10 shadow-2xl backdrop-blur-md">
+
+            <span class="text-7xl drop-shadow-lg">{{ course.icon }}</span>
+
+            <span class="mt-4 text-xs font-bold tracking-[0.2em]">
+              STUDYFLOW COURSE
+            </span>
+
+          </div>
+
+          }
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </section>
+
+  <!-- Overview Cards -->
+  <section class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+
+    @for (item of [
+    { label: 'Course Lessons', value: course.lessons, icon: '📚' },
+    { label: 'Course Duration', value: course.duration, icon: '⏱️' },
+    { label: 'Difficulty', value: course.level, icon: '🎯' },
+    { label: 'Language', value: course.language, icon: '🌐' }
+    ]; track item.label; let i = $index) {
+
+    <div class="cd-fade-up group relative overflow-hidden rounded-2xl border border-border
+                    bg-surface p-5 shadow-sm transition duration-300
+                    hover:-translate-y-1.5 hover:border-primary/40 hover:shadow-xl
+                    hover:shadow-primary/10" [style.animation-delay.ms]="200 + i * 90">
+
+      <div class="pointer-events-none absolute -right-8 -top-8 h-24 w-24 rounded-full
+                      bg-primary/10 transition duration-500 group-hover:scale-[2]"></div>
+
+      <span class="relative flex h-12 w-12 items-center justify-center rounded-xl
+                       bg-primary/10 text-2xl transition duration-300
+                       group-hover:rotate-6 group-hover:scale-110">
+        {{ item.icon }}
+      </span>
+
+      <p class="relative mt-4 text-sm text-muted">
+        {{ item.label }}
+      </p>
+
+      <h3 class="relative mt-1 text-xl font-extrabold">
+        {{ item.value }}
+      </h3>
+
+    </div>
+
+    }
+
+  </section>
+
+  <!-- Course Content -->
+  <section class="grid items-start gap-6 xl:grid-cols-3">
+
+    <!-- Curriculum -->
+    <div class="cd-fade-up rounded-3xl border border-border bg-surface p-6 shadow-sm
+                  sm:p-8 xl:col-span-2" style="animation-delay: 300ms">
+
+      <div class="flex items-start gap-4">
+
+        <span class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl
+                       bg-primary/10 text-2xl">
+          🗂️
+        </span>
+
+        <div>
+
+          <h2 class="text-xl font-extrabold sm:text-2xl">
+            Course Curriculum
+          </h2>
+
+          <p class="mt-1 text-sm text-muted">
+            Explore the published modules and lessons included in this course.
+          </p>
+
+        </div>
+
+      </div>
+
+      <div class="mt-7 space-y-3">
+
+        @for (module of modules(); track module.id; let m = $index) {
+
+        <div class="overflow-hidden rounded-2xl border bg-surface transition duration-300"
+          [class.border-primary/50]="expandedModule() === module.id" [class.shadow-lg]="expandedModule() === module.id"
+          [class.shadow-primary/10]="expandedModule() === module.id"
+          [class.border-border]="expandedModule() !== module.id">
+
+          <!-- Module Header -->
+          <button type="button" class="group flex w-full items-center justify-between gap-4
+                       bg-surface-secondary/60 p-4 text-left sm:p-5
+                       transition hover:bg-surface-secondary" [attr.aria-expanded]="expandedModule() === module.id"
+            (click)="toggleModule(module.id)">
+
+            <div class="flex min-w-0 items-center gap-4">
+
+              <span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl
+                               bg-primary/10 text-sm font-extrabold text-primary
+                               transition duration-300 group-hover:scale-105">
+                {{ m + 1 }}
+              </span>
+
+              <div class="min-w-0">
+
+                <h3 class="text-sm font-bold sm:text-base">
+                  {{ module.title }}
+                </h3>
+
+                @if (module.description) {
+                <p class="mt-1 text-xs text-muted">
+                  {{ module.description }}
+                </p>
+                }
+
+                <p class="mt-1.5 inline-flex items-center gap-1 rounded-full bg-primary/10
+                              px-2.5 py-0.5 text-[11px] font-semibold text-primary">
+                  {{ module.lectures.length }}
+                  {{ module.lectures.length === 1 ? 'Lesson' : 'Lessons' }}
+                </p>
+
+              </div>
+
+            </div>
+
+            <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full
+                             bg-primary/10 text-lg font-bold text-primary transition
+                             duration-300 group-hover:bg-primary group-hover:text-white"
+              [class.rotate-180]="expandedModule() === module.id">
+              {{ expandedModule() === module.id ? '−' : '+' }}
+            </span>
+
+          </button>
+
+          <!-- Module Lectures -->
+          @if (expandedModule() === module.id) {
+
+          <div class="cd-fade-up divide-y divide-border border-t border-border">
+
+            @for (lecture of module.lectures; track lecture.id; let l = $index) {
+
+            <div class="group/lesson flex items-center gap-3 p-4 transition
+                                hover:bg-primary/5 sm:px-5">
+
+              <span class="flex h-10 w-10 shrink-0 items-center justify-center
+                                   rounded-xl bg-primary/10 text-primary transition
+                                   duration-300 group-hover/lesson:scale-110
+                                   group-hover/lesson:bg-primary
+                                   group-hover/lesson:text-white">
+                ▶
+              </span>
+
+              <div class="min-w-0 flex-1">
+
+                <p class="text-sm font-semibold">
+                  {{ lecture.title }}
+                </p>
+
+                <p class="mt-1 text-xs text-muted">
+                  Video Lesson
+                </p>
+
+              </div>
+
+              <span class="shrink-0 rounded-full bg-surface-secondary px-3 py-1
+                                   text-xs font-medium text-muted">
+                ⏱ {{ lecture.duration }}
+              </span>
+
+            </div>
+
+            } @empty {
+
+            <div class="p-6 text-center">
+
+              <p class="text-sm text-muted">
+                No published lectures are available in this module yet.
+              </p>
+
+            </div>
+
+            }
+
+          </div>
+
+          }
+
+        </div>
+
+        } @empty {
+
+        <div class="rounded-2xl border border-dashed border-border
+                        bg-surface-secondary/40 p-10 text-center">
+
+          <span class="cd-float inline-block text-5xl">📚</span>
+
+          <h3 class="mt-3 font-semibold">
+            Curriculum coming soon
+          </h3>
+
+          <p class="mt-2 text-sm text-muted">
+            The instructor has not published any modules for this course yet.
+          </p>
+
+        </div>
+
+        }
+
+      </div>
+
+    </div>
+
+    <!-- Course Information -->
+    <aside class="space-y-6 xl:sticky xl:top-6">
+
+      <!-- Learning Outcomes -->
+      <div class="cd-fade-up relative overflow-hidden rounded-3xl border border-border
+                    bg-surface p-6 shadow-sm sm:p-7" style="animation-delay: 380ms">
+
+        <div class="pointer-events-none absolute -right-10 -top-10 h-32 w-32 rounded-full
+                      bg-accent/10 blur-2xl"></div>
+
+        <h2 class="relative flex items-center gap-2 text-lg font-extrabold">
+          <span>🏆</span> What You'll Learn
+        </h2>
+
+        @if (course.outcomes.length > 0) {
+
+        <div class="relative mt-5 space-y-3">
+
+          @for (outcome of course.outcomes; track outcome; let o = $index) {
+
+          <div class="cd-fade-up flex items-start gap-3 rounded-xl p-2.5 transition
+                            hover:bg-accent/5" [style.animation-delay.ms]="450 + o * 80">
+
+            <span class="mt-0.5 flex h-6 w-6 shrink-0
+                               items-center justify-center rounded-full
+                               bg-accent/15 text-xs font-bold text-accent">
+              ✓
+            </span>
+
+            <p class="text-sm leading-6 text-muted">
+              {{ outcome }}
+            </p>
+
+          </div>
+
+          }
+
+        </div>
+
+        } @else {
+
+        <p class="relative mt-4 text-sm leading-6 text-muted">
+          Learning outcomes will be available when the instructor
+          adds them to the course.
+        </p>
+
+        }
+
+      </div>
+
+      <!-- Instructor -->
+      <div class="cd-fade-up group relative overflow-hidden rounded-3xl border border-border
+                    bg-surface p-6 shadow-sm transition duration-300
+                    hover:border-primary/40 hover:shadow-xl hover:shadow-primary/10 sm:p-7"
+        style="animation-delay: 460ms">
+
+        <div class="pointer-events-none absolute inset-x-0 top-0 h-1
+                      bg-gradient-to-r from-[#5546D9] via-fuchsia-400 to-[#5546D9]"></div>
+
+        <h2 class="flex items-center gap-2 text-lg font-extrabold">
+          <span>🎓</span> Course Instructor
+        </h2>
+
+        <div class="mt-5 flex items-center gap-4">
+
+          <div class="relative">
+
+            <span class="cd-ring absolute inset-0 rounded-full border-2 border-primary/40"></span>
+
+            <div class="relative flex h-14 w-14 items-center justify-center
+                          rounded-full bg-gradient-to-br from-[#5546D9] to-[#3E31B0]
+                          text-xl font-extrabold text-white shadow-lg shadow-primary/30
+                          transition duration-300 group-hover:scale-110">
+              {{ course.instructor.charAt(0).toUpperCase() }}
+            </div>
+
+          </div>
+
+          <div>
+
+            <p class="text-sm font-bold">
+              {{ course.instructor }}
+            </p>
+
+            <p class="mt-1 text-xs text-muted">
+              Course Instructor
+            </p>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </aside>
+
+  </section>
+
+  <!-- Bottom Navigation -->
+  <div class="cd-fade-up relative overflow-hidden rounded-3xl
+                bg-gradient-to-r from-[#2a2842] via-[#201d3f] to-[#3d3778] p-6 text-white
+                shadow-xl shadow-[#5546D9]/25 sm:p-8" style="animation-delay: 520ms">
+
+    <div class="cd-drift pointer-events-none absolute -right-10 -top-16 h-48 w-48
+                  rounded-full bg-white/15 blur-2xl"></div>
+    <div class="pointer-events-none absolute -bottom-20 left-1/3 h-48 w-48
+                  rounded-full border-[28px] border-white/10"></div>
+
+    <div class="relative flex flex-wrap items-center justify-between gap-5">
+
+      <div>
+
+        <h3 class="text-xl font-extrabold sm:text-2xl">
+          Ready to start learning?
+        </h3>
+
+        <p class="mt-1.5 text-sm text-white/80">
+          Enroll in this course to begin your learning journey.
+        </p>
+
+      </div>
+
+      @if (enrollment()) {
+      <button type="button" [routerLink]="['/student/learning', course.id]"
+        class="w-full rounded-xl bg-primary px-6 py-3 font-semibold text-primary-foreground transition hover:opacity-90">
+        Continue Learning
+      </button>
+      } @else {
+      <button type="button" (click)="enrollInCourse()" [disabled]="isEnrolling() || !course"
+        class="w-full rounded-xl bg-primary px-6 py-3 font-semibold text-primary-foreground transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50">
+        @if (isEnrolling()) {
+        Enrolling...
+        } @else {
+        Enroll Now
+        }
+      </button>
+      }
+
+      @if (enrollmentError()) {
+      <p class="mt-3 text-sm text-red-500">
+        {{ enrollmentError() }}
+      </p>
+      }
+
+      @if (enrollmentSuccess()) {
+      <p class="mt-3 text-sm text-green-600">
+        {{ enrollmentSuccess() }}
+      </p>
+      }
+
+    </div>
+
+  </div>
+
+</div>
+
+} @else {
+
+<!-- Course Not Found -->
+<section class="relative overflow-hidden rounded-3xl border border-border
+                  bg-surface p-12 text-center">
+
+  <div class="pointer-events-none absolute -top-24 left-1/2 h-56 w-56 -translate-x-1/2
+                rounded-full bg-primary/10 blur-3xl"></div>
+
+  <span class="cd-float relative inline-block text-6xl">📚</span>
+
+  <h1 class="relative mt-5 text-2xl font-bold">
+    Course not found
+  </h1>
+
+  <p class="relative mt-2 text-sm text-muted">
+    The requested course could not be found.
+  </p>
+
+  <a routerLink="/student/courses" class="sf-primary-button relative mt-6 inline-flex">
+
+    Back to Courses
+
+  </a>
+
+</section>
+
+}

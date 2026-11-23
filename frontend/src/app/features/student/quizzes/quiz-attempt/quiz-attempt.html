@@ -1,0 +1,245 @@
+
+<div class="min-h-screen bg-background px-4 py-6 sm:px-6 lg:px-8">
+  <div class="mx-auto max-w-6xl">
+
+    @if (!submitted()) {
+      <!-- Header -->
+      <div class="mb-7 flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <a routerLink="/student/courses"
+             class="mb-3 inline-flex items-center gap-2 text-sm text-muted hover:text-primary">
+            ← Back to courses
+          </a>
+          <h1 class="text-2xl font-bold text-foreground sm:text-3xl">
+            {{ quizTitle }}
+          </h1>
+          <p class="mt-1 text-sm text-muted">
+            Test your understanding of Java fundamentals.
+          </p>
+        </div>
+
+        <div class="rounded-2xl border border-border bg-surface px-5 py-3 shadow-sm">
+          <p class="text-xs font-medium text-muted">TIME REMAINING</p>
+          <p class="mt-1 text-2xl font-bold tabular-nums"
+             [class.text-danger]="remainingSeconds() < 60"
+             [class.text-foreground]="remainingSeconds() >= 60">
+            {{ formatTime() }}
+          </p>
+        </div>
+      </div>
+
+      <!-- Progress -->
+      <div class="mb-6 rounded-2xl border border-border bg-surface p-4">
+        <div class="mb-2 flex justify-between text-sm">
+          <span class="font-semibold text-foreground">Quiz progress</span>
+          <span class="text-muted">
+            {{ answeredCount() }} / {{ questions.length }} answered
+          </span>
+        </div>
+        <div class="h-2 overflow-hidden rounded-full bg-surface-secondary">
+          <div class="h-full rounded-full bg-primary transition-all duration-300"
+               [style.width.%]="progress()">
+          </div>
+        </div>
+      </div>
+
+      <div class="grid gap-6 lg:grid-cols-[1fr_280px]">
+
+        <!-- Question panel -->
+        <section class="rounded-3xl border border-border bg-surface p-5 shadow-sm sm:p-8">
+          <div class="mb-7 flex items-center justify-between">
+            <span class="rounded-full bg-brand-tint px-3 py-1.5 text-xs font-bold text-primary">
+              QUESTION {{ currentIndex() + 1 }} OF {{ questions.length }}
+            </span>
+            <span class="text-sm text-muted">1 mark</span>
+          </div>
+
+          <h2 class="mb-8 text-xl font-semibold leading-relaxed text-foreground sm:text-2xl">
+            {{ currentQuestion().question }}
+          </h2>
+
+          <div class="space-y-3">
+            @for (option of currentQuestion().options; track $index) {
+              <button
+                type="button"
+                (click)="selectAnswer($index)"
+                class="flex w-full items-center gap-4 rounded-2xl border p-4 text-left transition"
+                [class.border-primary]="isSelected($index)"
+                [class.bg-brand-tint]="isSelected($index)"
+                [class.border-border]="!isSelected($index)"
+                [class.hover:border-primary]="!isSelected($index)"
+                [attr.aria-pressed]="isSelected($index)">
+
+                <span class="flex size-9 shrink-0 items-center justify-center rounded-xl border text-sm font-bold"
+                      [class.border-primary]="isSelected($index)"
+                      [class.bg-primary]="isSelected($index)"
+                      [class.text-primary-foreground]="isSelected($index)"
+                      [class.border-border]="!isSelected($index)"
+                      [class.text-muted]="!isSelected($index)">
+                  {{ ['A', 'B', 'C', 'D'][$index] }}
+                </span>
+
+                <span class="font-medium text-foreground">
+                  {{ option }}
+                </span>
+
+                @if (isSelected($index)) {
+                  <span class="ml-auto text-primary">✓</span>
+                }
+              </button>
+            }
+          </div>
+
+          <div class="mt-9 flex flex-wrap items-center justify-between gap-3 border-t border-border pt-6">
+            <button
+              type="button"
+              (click)="previousQuestion()"
+              [disabled]="currentIndex() === 0"
+              class="rounded-xl border border-border px-5 py-3 text-sm font-semibold text-foreground transition hover:bg-surface-secondary disabled:cursor-not-allowed disabled:opacity-40">
+              ← Previous
+            </button>
+
+            @if (currentIndex() < questions.length - 1) {
+              <button
+                type="button"
+                (click)="nextQuestion()"
+                class="sf-primary-button">
+                Next question →
+              </button>
+            } @else {
+              <button
+                type="button"
+                (click)="submitQuiz()"
+                class="rounded-xl bg-success px-5 py-3 text-sm font-semibold text-white transition hover:opacity-90">
+                Submit quiz
+              </button>
+            }
+          </div>
+        </section>
+
+        <!-- Question navigator -->
+        <aside class="h-fit rounded-3xl border border-border bg-surface p-5 shadow-sm">
+          <h3 class="font-bold text-foreground">Question navigator</h3>
+          <p class="mt-1 text-sm text-muted">Select a question to visit it.</p>
+
+          <div class="mt-5 grid grid-cols-5 gap-2">
+            @for (question of questions; track question.id; let i = $index) {
+              <button
+                type="button"
+                (click)="goToQuestion(i)"
+                class="flex aspect-square items-center justify-center rounded-xl border text-sm font-bold transition"
+                [class.border-primary]="currentIndex() === i"
+                [class.bg-primary]="currentIndex() === i"
+                [class.text-primary-foreground]="currentIndex() === i"
+                [class.bg-accent]="currentIndex() !== i && selectedAnswers()[i] !== undefined"
+                [class.border-accent]="currentIndex() !== i && selectedAnswers()[i] !== undefined"
+                [class.text-foreground]="currentIndex() !== i"
+                [class.border-border]="currentIndex() !== i && selectedAnswers()[i] === undefined">
+                {{ i + 1 }}
+              </button>
+            }
+          </div>
+
+          <div class="mt-6 space-y-3 border-t border-border pt-5 text-sm">
+            <div class="flex items-center gap-2">
+              <span class="size-3 rounded bg-accent"></span>
+              <span class="text-muted">Answered</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="size-3 rounded border border-border bg-surface"></span>
+              <span class="text-muted">Not answered</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="size-3 rounded bg-primary"></span>
+              <span class="text-muted">Current question</span>
+            </div>
+          </div>
+
+          <div class="mt-6 rounded-2xl bg-surface-secondary p-4">
+            <p class="text-sm font-semibold text-foreground">
+              {{ questions.length - answeredCount() }} unanswered
+            </p>
+            <p class="mt-1 text-xs leading-relaxed text-muted">
+              You can review your answers before submitting the quiz.
+            </p>
+          </div>
+
+          <button
+            type="button"
+            (click)="submitQuiz()"
+            class="mt-5 w-full rounded-xl bg-success px-4 py-3 text-sm font-semibold text-white hover:opacity-90">
+            Submit quiz
+          </button>
+        </aside>
+      </div>
+    } @else {
+      <!-- Result screen -->
+      <section class="mx-auto max-w-2xl rounded-3xl border border-border bg-surface p-6 text-center shadow-sm sm:p-10">
+        <div class="mx-auto flex size-20 items-center justify-center rounded-full bg-brand-tint text-4xl">
+          {{ percentage() >= 60 ? '🏆' : '📚' }}
+        </div>
+
+        <p class="mt-6 text-sm font-bold uppercase tracking-widest text-primary">
+          Quiz completed
+        </p>
+        <h1 class="mt-2 text-3xl font-bold text-foreground">
+          {{ percentage() >= 60 ? 'Great work!' : 'Keep learning!' }}
+        </h1>
+        <p class="mt-2 text-muted">
+          You have completed {{ quizTitle }}.
+        </p>
+
+        <div class="my-8 rounded-3xl bg-brand-tint p-7">
+          <p class="text-sm font-semibold text-primary">YOUR SCORE</p>
+          <p class="mt-2 text-5xl font-extrabold text-foreground">
+            {{ score() }}<span class="text-2xl text-muted">/{{ questions.length }}</span>
+          </p>
+          <p class="mt-2 text-lg font-bold text-primary">{{ percentage() }}%</p>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div class="rounded-2xl bg-surface-secondary p-4">
+            <p class="text-2xl font-bold text-success">{{ score() }}</p>
+            <p class="mt-1 text-sm text-muted">Correct answers</p>
+          </div>
+          <div class="rounded-2xl bg-surface-secondary p-4">
+            <p class="text-2xl font-bold text-danger">{{ questions.length - score() }}</p>
+            <p class="mt-1 text-sm text-muted">Incorrect answers</p>
+          </div>
+        </div>
+
+        <div class="mt-8 text-left">
+          <h2 class="mb-4 text-lg font-bold text-foreground">Answer review</h2>
+
+          @for (question of questions; track question.id; let i = $index) {
+            <div class="mb-3 rounded-2xl border border-border p-4">
+              <p class="font-semibold text-foreground">
+                {{ i + 1 }}. {{ question.question }}
+              </p>
+              <p class="mt-2 text-sm"
+                 [class.text-success]="selectedAnswers()[i] === question.correctAnswer"
+                 [class.text-danger]="selectedAnswers()[i] !== question.correctAnswer">
+                Your answer:
+                {{ selectedAnswers()[i] !== undefined
+                  ? question.options[selectedAnswers()[i]]
+                  : 'Not answered' }}
+              </p>
+              <p class="mt-1 text-sm font-medium text-success">
+                Correct answer: {{ question.options[question.correctAnswer] }}
+              </p>
+              <p class="mt-2 text-sm leading-relaxed text-muted">
+                {{ question.explanation }}
+              </p>
+            </div>
+          }
+        </div>
+
+        <a routerLink="/student/dashboard"
+           class="sf-primary-button mt-6 inline-flex justify-center">
+          Back to dashboard
+        </a>
+      </section>
+    }
+
+  </div>
+</div>

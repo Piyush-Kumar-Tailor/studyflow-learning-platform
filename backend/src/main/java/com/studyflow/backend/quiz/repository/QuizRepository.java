@@ -29,4 +29,12 @@ public interface QuizRepository extends JpaRepository<Quiz, Long> {
             Long courseId,
             String title
     );
+
+    boolean existsByLectureId(Long lectureId);
+
+    long countByPublishedTrue();
+
+    boolean existsByCourseId(Long courseId);
+
+
 }

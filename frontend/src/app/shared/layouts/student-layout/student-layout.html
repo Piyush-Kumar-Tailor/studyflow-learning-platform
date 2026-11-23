@@ -1,0 +1,363 @@
+<div class="min-h-screen bg-background text-foreground">
+
+  <!-- ============================== Mobile Overlay ============================== -->
+  @if (mobileMenuOpen()) {
+  <button type="button" aria-label="Close navigation menu"
+    class="fixed inset-0 z-40 bg-slate-950/50 backdrop-blur-sm lg:hidden" (click)="closeMobileMenu()">
+  </button>
+  }
+
+  <!-- ============================== Sidebar ============================== -->
+  <aside class="fixed inset-y-0 left-0 z-50 flex w-72 flex-col
+           border-r border-border bg-surface
+           shadow-2xl shadow-slate-950/10 lg:shadow-none
+           transition-transform duration-300 ease-out
+           lg:translate-x-0" [class.-translate-x-full]="!mobileMenuOpen()">
+
+    <!-- Brand -->
+    <div class="relative flex h-20 shrink-0 items-center gap-3 border-b border-border px-6">
+
+      <div class="relative flex h-11 w-11 items-center justify-center
+                  rounded-xl bg-primary text-white
+                  shadow-lg shadow-primary/30 ring-4 ring-primary/10">
+
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-6 w-6">
+          <path d="M3 7.5 12 3l9 4.5-9 4.5-9-4.5Z" />
+          <path d="M7 10v6c3.3 2.7 6.7 2.7 10 0v-6" />
+          <path d="M21 8v7" />
+        </svg>
+
+        <span class="absolute -right-0.5 -top-0.5 h-3 w-3 rounded-full
+                     border-2 border-surface bg-accent"></span>
+
+      </div>
+
+      <div class="min-w-0">
+        <h1 class="text-xl font-extrabold tracking-tight">
+          Study<span class="text-primary">Flow</span>
+        </h1>
+        <p class="text-[10px] font-semibold tracking-[0.18em] text-muted">
+          LEARN. GROW. ACHIEVE.
+        </p>
+      </div>
+
+      <button type="button" aria-label="Close navigation menu"
+        class="ml-auto flex h-9 w-9 items-center justify-center rounded-lg text-muted
+               transition hover:bg-surface-secondary hover:text-foreground lg:hidden"
+        (click)="closeMobileMenu()">
+        ✕
+      </button>
+
+      <!-- Brand underline accent -->
+      <div class="pointer-events-none absolute -bottom-px left-6 h-px w-24
+                  bg-gradient-to-r from-primary to-transparent"></div>
+
+    </div>
+
+    <!-- Navigation -->
+    <nav class="flex-1 space-y-7 overflow-y-auto px-4 py-6">
+
+      <!-- Learning space -->
+      <div>
+        <p class="mb-3 flex items-center gap-2 px-3 text-[10px] font-bold tracking-[0.18em] text-muted">
+          <span class="h-px w-3 bg-border"></span>
+          LEARNING SPACE
+        </p>
+
+        <div class="space-y-1">
+
+          <a routerLink="/student/dashboard"
+            routerLinkActive="active-link !bg-primary/10 !text-primary !font-semibold before:scale-y-100"
+            [routerLinkActiveOptions]="{ exact: true }" (click)="closeMobileMenu()" class="group relative flex items-center gap-3 rounded-xl px-3 py-2.5
+                   text-sm font-medium text-muted transition duration-200
+                   before:absolute before:bottom-2 before:left-0
+                   before:top-2 before:w-1 before:scale-y-0
+                   before:rounded-r-full before:bg-primary
+                   before:transition-transform before:duration-300
+                   hover:bg-surface-secondary hover:text-foreground">
+
+            <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg
+                         bg-surface-secondary text-base transition duration-200
+                         group-hover:scale-110 group-hover:bg-primary/10 group-hover:text-primary
+                         group-[.active-link]:bg-primary group-[.active-link]:text-white
+                         group-[.active-link]:shadow-md group-[.active-link]:shadow-primary/30">⌂</span>
+            Dashboard
+          </a>
+
+          <a routerLink="/student/courses"
+            routerLinkActive="active-link !bg-primary/10 !text-primary !font-semibold before:scale-y-100"
+            (click)="closeMobileMenu()" class="group relative flex items-center gap-3 rounded-xl px-3 py-2.5
+                   text-sm font-medium text-muted transition duration-200
+                   before:absolute before:bottom-2 before:left-0
+                   before:top-2 before:w-1 before:scale-y-0
+                   before:rounded-r-full before:bg-primary
+                   before:transition-transform before:duration-300
+                   hover:bg-surface-secondary hover:text-foreground">
+
+            <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg
+                         bg-surface-secondary text-base transition duration-200
+                         group-hover:scale-110 group-hover:bg-primary/10 group-hover:text-primary
+                         group-[.active-link]:bg-primary group-[.active-link]:text-white
+                         group-[.active-link]:shadow-md group-[.active-link]:shadow-primary/30">▤</span>
+            Explore Courses
+          </a>
+
+          <a routerLink="/student/learning"
+            routerLinkActive="active-link !bg-primary/10 !text-primary !font-semibold before:scale-y-100"
+            (click)="closeMobileMenu()" class="group relative flex items-center gap-3 rounded-xl px-3 py-2.5
+                   text-sm font-medium text-muted transition duration-200
+                   before:absolute before:bottom-2 before:left-0
+                   before:top-2 before:w-1 before:scale-y-0
+                   before:rounded-r-full before:bg-primary
+                   before:transition-transform before:duration-300
+                   hover:bg-surface-secondary hover:text-foreground">
+
+            <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg
+                         bg-surface-secondary text-base transition duration-200
+                         group-hover:scale-110 group-hover:bg-primary/10 group-hover:text-primary
+                         group-[.active-link]:bg-primary group-[.active-link]:text-white
+                         group-[.active-link]:shadow-md group-[.active-link]:shadow-primary/30">▶</span>
+            My Learning
+          </a>
+
+        </div>
+      </div>
+
+      <!-- Practice & revision -->
+      <div>
+        <p class="mb-3 flex items-center gap-2 px-3 text-[10px] font-bold tracking-[0.18em] text-muted">
+          <span class="h-px w-3 bg-border"></span>
+          PRACTICE & REVISION
+        </p>
+
+        <div class="space-y-1">
+
+          <a routerLink="/student/quizzes"
+            routerLinkActive="active-link !bg-primary/10 !text-primary !font-semibold before:scale-y-100"
+            (click)="closeMobileMenu()" class="group relative flex items-center gap-3 rounded-xl px-3 py-2.5
+                   text-sm font-medium text-muted transition duration-200
+                   before:absolute before:bottom-2 before:left-0
+                   before:top-2 before:w-1 before:scale-y-0
+                   before:rounded-r-full before:bg-primary
+                   before:transition-transform before:duration-300
+                   hover:bg-surface-secondary hover:text-foreground">
+
+            <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg
+                         bg-surface-secondary text-base transition duration-200
+                         group-hover:scale-110 group-hover:bg-primary/10 group-hover:text-primary
+                         group-[.active-link]:bg-primary group-[.active-link]:text-white
+                         group-[.active-link]:shadow-md group-[.active-link]:shadow-primary/30">▣</span>
+            Quizzes & Tests
+          </a>
+
+          <a routerLink="/student/bookmarks"
+            routerLinkActive="active-link !bg-primary/10 !text-primary !font-semibold before:scale-y-100"
+            (click)="closeMobileMenu()" class="group relative flex items-center gap-3 rounded-xl px-3 py-2.5
+                   text-sm font-medium text-muted transition duration-200
+                   before:absolute before:bottom-2 before:left-0
+                   before:top-2 before:w-1 before:scale-y-0
+                   before:rounded-r-full before:bg-primary
+                   before:transition-transform before:duration-300
+                   hover:bg-surface-secondary hover:text-foreground">
+
+            <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg
+                         bg-surface-secondary text-base transition duration-200
+                         group-hover:scale-110 group-hover:bg-primary/10 group-hover:text-primary
+                         group-[.active-link]:bg-primary group-[.active-link]:text-white
+                         group-[.active-link]:shadow-md group-[.active-link]:shadow-primary/30">◇</span>
+            Bookmarks
+          </a>
+
+          <a routerLink="/student/notes"
+            routerLinkActive="active-link !bg-primary/10 !text-primary !font-semibold before:scale-y-100"
+            (click)="closeMobileMenu()" class="group relative flex items-center gap-3 rounded-xl px-3 py-2.5
+                   text-sm font-medium text-muted transition duration-200
+                   before:absolute before:bottom-2 before:left-0
+                   before:top-2 before:w-1 before:scale-y-0
+                   before:rounded-r-full before:bg-primary
+                   before:transition-transform before:duration-300
+                   hover:bg-surface-secondary hover:text-foreground">
+
+            <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg
+                         bg-surface-secondary text-base transition duration-200
+                         group-hover:scale-110 group-hover:bg-primary/10 group-hover:text-primary
+                         group-[.active-link]:bg-primary group-[.active-link]:text-white
+                         group-[.active-link]:shadow-md group-[.active-link]:shadow-primary/30">▧</span>
+            My Notes
+          </a>
+
+        </div>
+      </div>
+
+      <!-- Personal -->
+      <div>
+        <p class="mb-3 flex items-center gap-2 px-3 text-[10px] font-bold tracking-[0.18em] text-muted">
+          <span class="h-px w-3 bg-border"></span>
+          PERSONAL
+        </p>
+
+        <a routerLink="/student/profile"
+          routerLinkActive="active-link !bg-primary/10 !text-primary !font-semibold before:scale-y-100" (click)="closeMobileMenu()"
+          class="group relative flex items-center gap-3 rounded-xl px-3 py-2.5
+                 text-sm font-medium text-muted transition duration-200
+                 before:absolute before:bottom-2 before:left-0
+                 before:top-2 before:w-1 before:scale-y-0
+                 before:rounded-r-full before:bg-primary
+                 before:transition-transform before:duration-300
+                 hover:bg-surface-secondary hover:text-foreground">
+
+          <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg
+                       bg-surface-secondary text-base transition duration-200
+                       group-hover:scale-110 group-hover:bg-primary/10 group-hover:text-primary
+                       group-[.active-link]:bg-primary group-[.active-link]:text-white
+                       group-[.active-link]:shadow-md group-[.active-link]:shadow-primary/30">♙</span>
+          My Profile
+        </a>
+
+      </div>
+
+    </nav>
+
+    <!-- Sidebar motivation card -->
+    <div class="shrink-0 px-4 pb-4">
+
+      <div class="relative isolate overflow-hidden rounded-2xl bg-primary p-4 text-white
+                  shadow-lg shadow-primary/20">
+
+        <div class="pointer-events-none absolute -right-8 -top-8 -z-10 h-28 w-28
+                    rounded-full border-[18px] border-white/10"></div>
+        <div class="pointer-events-none absolute -bottom-10 -left-6 -z-10 h-24 w-24
+                    rounded-full bg-accent/30 blur-2xl"></div>
+
+        <p class="text-lg">✨</p>
+        <p class="mt-1 text-sm font-bold">Keep learning daily</p>
+        <p class="mt-0.5 text-xs leading-5 text-white/80">
+          Small steps every day lead to big achievements.
+        </p>
+
+      </div>
+
+    </div>
+
+    <!-- Bottom Sidebar Profile -->
+    <div class="shrink-0 space-y-2 border-t border-border p-4">
+
+      <div class="flex min-w-0 items-center gap-3 rounded-xl bg-surface-secondary/60 p-2.5">
+
+        <div class="relative shrink-0">
+          <div
+            class="flex size-11 items-center justify-center rounded-full bg-brand-tint font-bold text-primary ring-2 ring-primary/20">
+            {{ authService.currentUser()?.name?.charAt(0)?.toUpperCase() || 'S' }}
+          </div>
+          <span class="absolute bottom-0 right-0 h-3 w-3 rounded-full border-2 border-surface bg-emerald-400"></span>
+        </div>
+
+        <div class="min-w-0">
+          <p class="truncate text-sm font-bold text-foreground">
+            {{ authService.currentUser()?.name || 'Student' }}
+          </p>
+
+          <p class="truncate text-xs text-muted">
+            {{ authService.currentUser()?.email || 'Loading account...' }}
+          </p>
+        </div>
+
+      </div>
+
+      <button type="button" (click)="logout()"
+        class="group flex w-full items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-semibold
+               text-danger transition duration-200 hover:bg-surface-secondary">
+        <span class="transition-transform duration-200 group-hover:translate-x-1">↪</span>
+        Sign out
+      </button>
+
+    </div>
+
+  </aside>
+
+  <!-- ============================== Main Application ============================== -->
+  <div class="min-h-screen lg:pl-72">
+
+    <!-- Top Navigation -->
+    <header class="sticky top-0 z-30 flex h-20 items-center
+                   justify-between gap-4 border-b border-border
+                   bg-surface/85 px-4 backdrop-blur-xl
+                   sm:px-7 lg:px-9">
+
+      <div class="flex min-w-0 items-center gap-3">
+
+        <button type="button" aria-label="Open navigation menu" class="flex h-11 w-11 items-center justify-center rounded-xl border border-border
+                 text-foreground transition hover:border-primary/30 hover:bg-surface-secondary lg:hidden" (click)="toggleMobileMenu()">
+          ☰
+        </button>
+
+        <div class="min-w-0">
+          <p class="truncate text-base font-bold tracking-tight">
+            <span class="hidden sm:inline">{{ authService.currentUser()?.name || 'Student' }}'s </span>Workspace
+          </p>
+          <p class="hidden items-center gap-2 text-xs text-muted sm:flex">
+            <span class="h-1.5 w-1.5 rounded-full bg-accent"></span>
+            Your personal learning environment
+          </p>
+        </div>
+
+      </div>
+
+      <div class="flex shrink-0 items-center gap-2 sm:gap-4">
+
+        <app-theme-toggle />
+
+        <div class="hidden h-9 w-px bg-border sm:block"></div>
+
+        <div class="flex items-center gap-3 rounded-full border border-border bg-surface py-1.5 pl-1.5 pr-1.5
+                    transition hover:border-primary/30 hover:shadow-sm sm:pr-4">
+
+          <div class="flex h-10 w-10 items-center justify-center
+                      rounded-full bg-primary text-sm font-bold text-white
+                      shadow-md shadow-primary/25">
+            {{ authService.currentUser()?.name?.charAt(0)?.toUpperCase() || 'S' }}
+          </div>
+
+          <div class="hidden leading-tight sm:block">
+            <p class="text-sm font-semibold">{{ authService.currentUser()?.name || 'Student' }}</p>
+            <p class="text-xs text-muted">My Account</p>
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- Header bottom gradient line -->
+      <div class="pointer-events-none absolute inset-x-0 -bottom-px h-px
+                  bg-gradient-to-r from-transparent via-primary/40 to-transparent"></div>
+
+    </header>
+
+    <!-- Routed Page Content -->
+    <main class="mx-auto w-full max-w-[1600px] p-4 sm:p-7 lg:p-9">
+
+      <router-outlet />
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-border px-5 py-6">
+
+      <div class="mx-auto flex max-w-[1600px] flex-col items-center justify-between gap-2 sm:flex-row">
+
+        <p class="flex items-center gap-2 text-xs font-semibold">
+          <span class="flex h-6 w-6 items-center justify-center rounded-md bg-primary text-[11px] text-white">🎓</span>
+          Study<span class="-ml-1.5 text-primary">Flow</span>
+        </p>
+
+        <p class="text-xs text-muted">
+          © 2026 StudyFlow. Learn smarter. Achieve more.
+        </p>
+
+      </div>
+
+    </footer>
+
+  </div>
+
+</div>
